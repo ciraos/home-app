@@ -7,7 +7,7 @@
 import type { ComponentType } from "react";
 import {
   Database,
-  GitBranch,
+  Globe,
   Laptop,
   Mail,
   Rss,
@@ -31,10 +31,11 @@ export const profile = {
 } as const;
 
 // ---------- 数据统计 ----------
+// 「网站」数量由下方 projects 列表长度实时计算（见 page.tsx 渲染逻辑）
 export const stats: { label: string; value: string }[] = [
-  { label: "文章", value: "12" },
-  { label: "项目", value: "6" },
-  { label: "码龄", value: "3年" },
+  { label: "文章", value: "12" }, // 实际值由 articles API 实时获取
+  { label: "网站", value: "0" }, // 实际值 = projects.length
+  { label: "码龄", value: "0年" }, // 实际值 = 当前年份 - 2020（随年份自动 +1）
   { label: "咖啡", value: "∞" },
 ];
 
@@ -62,38 +63,9 @@ export const skillGroups: { title: string; icon: IconType; items: string[] }[] =
   },
 ];
 
-// ---------- 最近文章（占位，替换成你的真实文章） ----------
-export const posts: {
-  title: string;
-  excerpt: string;
-  tag: string;
-  date: string;
-  url: string;
-}[] = [
-    {
-      title: "从零搭建个人主页：技术选型与踩坑记录",
-      excerpt: "记录了我从选框架、配域名到部署上线的全过程，以及那些让人抓狂的小坑。",
-      tag: "随笔",
-      date: "2025-11-02",
-      url: "#",
-    },
-    {
-      title: "Next.js 16 迁移实践笔记",
-      excerpt: "升级到 Next.js 16 后遇到的变化与应对方案，包括配置、路由与图片优化的调整。",
-      tag: "前端",
-      date: "2025-09-18",
-      url: "#",
-    },
-    {
-      title: "我的第一台服务器折腾记",
-      excerpt: "从买服务器、装系统到配置 Nginx 与 HTTPS，一个新手踩过的所有坑。",
-      tag: "运维",
-      date: "2025-06-30",
-      url: "#",
-    },
-  ];
+// ---------- 最近文章（已改为从 blog.ciraos.top 前端 API 实时拉取，见 src/lib/articles.ts） ----------
 
-// ---------- 个人项目（占位，替换成你的真实项目） ----------
+// ---------- 个人网站 ----------
 export const projects: {
   name: string;
   description: string;
@@ -105,50 +77,79 @@ export const projects: {
       description:
         "你现在看到的这个网站，基于 Next.js 16 + Tailwind CSS 构建，支持暗色模式，并接入了随机毒鸡汤 API。",
       tags: ["Next.js", "TypeScript", "Tailwind CSS"],
-      links: [{ label: "GitHub", href: "https://github.com/", icon: GithubIcon }],
-    },
-    // {
-    //   name: "毒鸡汤 API",
-    //   description:
-    //     "托管在 nsuuu.com 的毒鸡汤接口，随机返回一句“扎心”文案，为本站 hero 区提供每日毒汤。",
-    //   tags: ["API", "Node.js"],
-    //   links: [{ label: "接口地址", href: "https://v1.nsuuu.com/api", icon: Globe }],
-    // },
-    {
-      name: "学习笔记仓库",
-      description:
-        "整理前端、后端与运维相关的学习笔记，持续更新中，欢迎 star 和交流。",
-      tags: ["Markdown", "文档"],
-      links: [{ label: "GitHub", href: "https://github.com/", icon: GithubIcon }],
+      links: [{ label: "主页", href: "https://ciraos.top", icon: Globe }],
     },
     {
-      name: "小工具集",
+      name: "博客",
       description:
-        "日常开发中顺手写的一些小工具与脚本，比如图片压缩、JSON 格式化等。",
-      tags: ["Node.js", "脚本"],
-      links: [{ label: "仓库", href: "https://github.com/", icon: GitBranch }],
+        "我的博客站点，记录学习笔记、踩坑经验与生活点滴。",
+      tags: ["博客"],
+      links: [{ label: "博客", href: "https://blog.ciraos.top", icon: Globe }],
+    },
+    {
+      name: "预览博客",
+      description:
+        "博客新主题与新功能的预览环境，用于上线前的体验和调试。",
+      tags: ["预览"],
+      links: [{ label: "预览", href: "https://demo.blog.ciraos.top", icon: Globe }],
+    },
+    {
+      name: "ech0",
+      description:
+        "「ech0」——一个有回声的小项目（占位描述，内容可自行替换）。",
+      tags: ["ech0"],
+      links: [{ label: "ech0", href: "https://ech0.ciraos.top", icon: Globe }],
+    },
+    {
+      name: "葱苓节点",
+      description:
+        "葱苓的网络节点（占位描述，内容可自行替换）。",
+      tags: ["节点"],
+      links: [{ label: "节点", href: "https://node.ciraos.top", icon: Globe }],
+    },
+    {
+      name: "葱苓的网盘",
+      description:
+        "葱苓的网盘，用于文件分享与存储（占位描述，内容可自行替换）。",
+      tags: ["网盘"],
+      links: [{ label: "网盘", href: "https://pan.ciraos.top", icon: Globe }],
+    },
+    {
+      name: "青龙面板",
+      description:
+        "青龙面板（不对外公开，不提供链接）。",
+      tags: ["面板"],
+      links: [],
+    },
+    {
+      name: "uptime-kuma",
+      description:
+        "站点可用性监控面板（uptime-kuma）。",
+      tags: ["监控"],
+      links: [{ label: "监控", href: "https://stat.ciraos.top", icon: Globe }],
     },
   ];
 
 // ---------- 成长时间线（占位，替换成你的经历） ----------
-export const timeline: { date: string; title: string; description: string }[] = [
+// date 为可选：记不清年份时可注释掉，页面则不显示日期
+export const timeline: { date?: string; title: string; description: string }[] = [
   {
-    date: "2025",
+    // date: "2025", // 已注释：记不清具体年份
     title: "搭建个人主页",
     description: "用 Next.js 从零搭起了这个小站，开始把想法变成线上作品。",
   },
   {
-    date: "2024",
+    // date: "2024", // 已注释：记不清具体年份
     title: "折腾服务器与域名",
     description: "买了第一台服务器，学会了 Linux、Nginx 与 HTTPS，也踩了不少坑。",
   },
   {
-    date: "2023",
+    // date: "2023", // 已注释：记不清具体年份
     title: "开始学习前端开发",
     description: "从 HTML/CSS 起步，接触了 JavaScript 与 React，打开了新世界的大门。",
   },
   {
-    date: "2022",
+    // date: "2020", // 已注释：记不清具体年份
     title: "与编程结缘",
     description: "因为好奇一行代码如何变成网页，从此走上程序员之路。",
   },
@@ -163,6 +164,6 @@ export const socials: {
 }[] = [
     { label: "GitHub", href: "https://github.com/ciraos", icon: GithubIcon, external: true },
     { label: "邮箱", href: "mailto:ciraos@yeah.net", icon: Mail },
-    { label: "RSS", href: "#", icon: Rss, external: true },
+    { label: "RSS", href: "/rss.xml", icon: Rss, external: true },
     // { label: "毒鸡汤 API", href: "https://v1.nsuuu.com/api", icon: Quote, external: true },
   ];

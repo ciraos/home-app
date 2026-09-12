@@ -37,7 +37,9 @@ export function FloatingActions() {
 
   const showBackToTop = scrollY > SCROLL_THRESHOLD;
   const isDark = resolvedTheme === "dark";
-  const themeLabel = isDark ? "切换到浅色模式" : "切换到深色模式";
+  // 主题在客户端按日出日落动态确定（服务端无法预知），为避免服务端/客户端渲染不一致的
+  // hydration 告警，这里使用主题无关的通用文案；实际切换逻辑仍由 isDark 正确驱动。
+  const themeLabel = "切换深浅色模式";
 
   return (
     <>

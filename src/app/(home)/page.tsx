@@ -7,25 +7,28 @@ import {
   ArrowUp,
   BookMarked,
   Calendar,
+  Globe,
   GraduationCap,
   Heart,
   Mail,
   MapPin,
-  Rocket,
   Send,
   Zap,
 } from "lucide-react";
 import { GithubIcon } from "@/components/icons";
 import {
-  posts,
   profile,
   projects,
-  skillGroups,
   socials,
   stats,
   timeline,
   type IconType,
 } from "@/lib/profile";
+import {
+  getRecentArticles,
+  getArticleCount,
+  type RecentArticle,
+} from "@/lib/articles";
 
 export const metadata: Metadata = {
   title: "米葱苓的主页",
@@ -61,7 +64,10 @@ function Section({
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const recentArticles = await getRecentArticles();
+  const articleCount = await getArticleCount();
+
   return (
     <div className="mx-auto w-full max-w-4xl space-y-12 px-5 py-10">
       {/* 关于我 */}
@@ -117,7 +123,15 @@ export default function Home() {
               key={stat.label}
               className={`${card} flex flex-col items-center gap-1 p-5 text-center`}
             >
-              <span className="text-2xl font-bold">{stat.value}</span>
+              <span className="text-2xl font-bold">
+                {stat.label === "文章"
+                  ? (articleCount ?? stat.value)
+                  : stat.label === "网站"
+                    ? projects.length
+                    : stat.label === "码龄"
+                      ? `${new Date().getFullYear() - 2020}年`
+                      : stat.value}
+              </span>
               <span className="text-sm text-muted-foreground">{stat.label}</span>
             </div>
           ))}
@@ -126,7 +140,8 @@ export default function Home() {
 
       {/* 技术栈 */}
       <Section id="skills" icon={Zap} title="技术栈">
-        <div className="grid gap-4 sm:grid-cols-2">
+        {/* 原有技能网格已注释掉，改用整活文案 */}
+        {/* <div className="grid gap-4 sm:grid-cols-2">
           {skillGroups.map((group) => (
             <div key={group.title} className={`${card} p-6`}>
               <h3 className="flex items-center gap-2 text-sm font-semibold">
@@ -145,36 +160,56 @@ export default function Home() {
               </div>
             </div>
           ))}
+        </div> */}
+
+        {/* 大号滑稽表情 + 一行文案 */}
+        <div className={`${card} flex flex-col items-center gap-4 p-10 text-center`}>
+          <span
+            role="img"
+            aria-label="滑稽表情"
+            className="text-7xl leading-none sm:text-8xl"
+          >
+            😏
+          </span>
+          <p className="text-base text-muted-foreground">
+            骗你的，啥都不会，全靠AI
+          </p>
         </div>
       </Section>
 
       {/* 最近文章 */}
       <Section id="posts" icon={BookMarked} title="最近文章">
         <div className="grid gap-4 sm:grid-cols-3">
-          {posts.map((post) => (
-            <Link
-              key={post.title}
-              href={post.url}
-              className={`${card} group flex flex-col gap-2.5 p-6`}
-            >
-              <span className="w-fit rounded-full bg-primary/10 px-2.5 py-0.5 text-xs text-primary">
-                {post.tag}
-              </span>
-              <h3 className="font-semibold transition-colors group-hover:text-primary">
-                {post.title}
-              </h3>
-              <p className="line-clamp-3 flex-1 text-sm leading-relaxed text-muted-foreground">
-                {post.excerpt}
-              </p>
-              <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Calendar className="size-3.5" />
-                {post.date}
-              </span>
-            </Link>
-          ))}
+          {recentArticles.length === 0 ? (
+            <div className={`${card} p-6 text-sm text-muted-foreground`}>
+              暂无文章，稍后再来看看吧～
+            </div>
+          ) : (
+            recentArticles.map((post: RecentArticle) => (
+              <div
+                key={post.id}
+                className={`${card} group flex flex-col gap-2.5 p-6`}
+              >
+                {post.tag && (
+                  <span className="w-fit rounded-full bg-primary/10 px-2.5 py-0.5 text-xs text-primary">
+                    {post.tag}
+                  </span>
+                )}
+                <h3 className="flex-1 font-semibold transition-colors group-hover:text-primary">
+                  {post.title}
+                </h3>
+                <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Calendar className="size-3.5" />
+                  {post.date}
+                </span>
+              </div>
+            ))
+          )}
         </div>
         <Link
-          href="#"
+          href="https://blog.ciraos.top/posts"
+          target="_blank"
+          rel="noreferrer"
           className="mt-4 inline-flex items-center gap-1 text-sm text-primary transition-colors hover:underline"
         >
           查看全部文章
@@ -182,8 +217,8 @@ export default function Home() {
         </Link>
       </Section>
 
-      {/* 个人项目 */}
-      <Section id="projects" icon={Rocket} title="个人项目">
+      {/* 个人网站 */}
+      <Section id="projects" icon={Globe} title="个人网站">
         <div className="grid gap-4 sm:grid-cols-2">
           {projects.map((project) => (
             <div key={project.name} className={`${card} flex flex-col gap-3 p-6`}>
@@ -230,7 +265,9 @@ export default function Home() {
               <li key={item.title} className="relative">
                 <span className="absolute -left-7.5 top-1 size-3 rounded-full bg-primary ring-4 ring-primary/20" />
                 <p className="text-sm font-semibold">{item.title}</p>
-                <p className="text-xs text-muted-foreground">{item.date}</p>
+                {item.date && (
+                  <p className="text-xs text-muted-foreground">{item.date}</p>
+                )}
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                   {item.description}
                 </p>
