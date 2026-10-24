@@ -2,34 +2,13 @@ import Image from "next/image";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
-import { DuJiTangResponse } from "@/type/dujitang";
+import { getRenjianQuote } from "@/lib/dujitang";
 import { ChevronDown } from "lucide-react";
 
-const baseUrl = process.env.NEXT_PUBLIC_NSUUU_API_URL;
 export const dynamic = "force-dynamic";
 
-async function getPoisonousChickenSoup() {
-  try {
-    const a = await fetch(`${baseUrl}/dujitang`, {
-      cache: "no-cache",
-      // next: { revalidate: 0 }
-    });
-    if (!a.ok) {
-      throw new Error("请求毒鸡汤API失败!");
-    }
-    const data = await a.json();
-    const res = await data as DuJiTangResponse;
-    // console.log(res);
-    // console.log(res.data);
-    return res.data;
-  } catch (error) {
-    console.error("获取毒鸡汤数据错误:", error);
-    return "今天的毒鸡汤加载失败了，换个心情吧～";
-  }
-}
-
 export default async function HomeLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const djt = await getPoisonousChickenSoup();
+  const djt = await getRenjianQuote();
 
   return (
     <>
