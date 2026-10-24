@@ -103,9 +103,23 @@ export const projects: {
     {
       name: "葱苓节点",
       description:
-        "葱苓的网络节点（占位描述，内容可自行替换）。",
-      tags: ["节点"],
+        "用来监控服务器状态的小站。",
+      tags: ["节点", "监控"],
       links: [{ label: "节点", href: "https://node.ciraos.top", icon: Globe }],
+    },
+    {
+      name: "ciraos new api",
+      description:
+        "自用的 AI 中转站，统一转发各家模型接口。",
+      tags: ["AI", "中转"],
+      links: [{ label: "new api", href: "https://sub.ciraos.top", icon: Globe }],
+    },
+    {
+      name: "葱苓博客流量分析",
+      description:
+        "用来分析博客访问流量的看板。",
+      tags: ["流量", "统计"],
+      links: [{ label: "流量分析", href: "https://eodata.ciraos.top", icon: Globe }],
     },
     {
       name: "葱苓的网盘",
