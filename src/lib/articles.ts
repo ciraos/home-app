@@ -58,20 +58,31 @@ async function fetchArticleList(): Promise<{
   }
 }
 
-/** 拉取最近文章列表，失败时返回空数组（由页面兜底展示） */
-export async function getRecentArticles(): Promise<RecentArticle[]> {
-  const result = await fetchArticleList();
-  if (!result) return [];
-  return result.list.map((item) => ({
-    id: item.id,
-    title: item.title,
-    tag: item.post_tags?.[0]?.name ?? "",
-    date: item.created_at?.slice(0, 10) ?? "",
-  }));
+/** 首页要展示的文章数据：最近列表 + 总数 */
+export interface HomeArticles {
+  /** 最近文章列表，接口失败时为空数组（由页面兜底展示） */
+  articles: RecentArticle[];
+  /** 文章总数，接口失败时为 undefined（页面回落为 profile.ts 里的占位值） */
+  count?: number;
 }
 
-/** 文章总数；接口不可用时返回 undefined（页面做兜底） */
-export async function getArticleCount(): Promise<number | undefined> {
+/**
+ * 一次取回首页需要的全部文章数据（最近列表 + 总数）。
+ *
+ * 列表和总数来自同一个接口，所以合并成一次调用、一次 JSON 解析，
+ * 页面只需 await 一次；接口不可用时返回空列表，不抛错。
+ */
+export async function getArticles(): Promise<HomeArticles> {
   const result = await fetchArticleList();
-  return result ? result.total : undefined;
+  if (!result) return { articles: [] };
+
+  return {
+    count: result.total,
+    articles: result.list.map((item) => ({
+      id: item.id,
+      title: item.title,
+      tag: item.post_tags?.[0]?.name ?? "",
+      date: item.created_at?.slice(0, 10) ?? "",
+    })),
+  };
 }

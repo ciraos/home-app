@@ -24,11 +24,7 @@ import {
   timeline,
   type IconType,
 } from "@/lib/profile";
-import {
-  getRecentArticles,
-  getArticleCount,
-  type RecentArticle,
-} from "@/lib/articles";
+import { getArticles } from "@/lib/articles";
 
 export const metadata: Metadata = {
   title: "米葱苓的主页",
@@ -65,8 +61,8 @@ function Section({
 }
 
 export default async function Home() {
-  const recentArticles = await getRecentArticles();
-  const articleCount = await getArticleCount();
+  // 列表与总数来自同一个接口，一次取回，避免重复请求
+  const { articles: recentArticles, count: articleCount } = await getArticles();
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-12 px-5 py-10">
@@ -185,7 +181,7 @@ export default async function Home() {
               暂无文章，稍后再来看看吧～
             </div>
           ) : (
-            recentArticles.map((post: RecentArticle) => (
+            recentArticles.map((post) => (
               <div
                 key={post.id}
                 className={`${card} group flex flex-col gap-2.5 p-6`}
