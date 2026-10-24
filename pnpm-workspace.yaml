@@ -1,4 +1,6 @@
-ignoredBuiltDependencies:
-  - msw
-  - sharp
-  - unrs-resolver
+# pnpm 11 起构建脚本白名单改为 allowBuilds（ignoredBuiltDependencies 已废弃）：
+# false = 明确不执行该依赖的安装脚本
+allowBuilds:
+  msw: false
+  sharp: false
+  unrs-resolver: false
