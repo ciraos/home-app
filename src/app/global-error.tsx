@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
+import { site } from "@/lib/site";
 import "./globals.css";
 
 /**
@@ -23,7 +24,7 @@ export default function GlobalError({
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <body className="bg-background text-foreground">
-        <title>出错了 · 米葱苓的主页</title>
+        <title>{`出错了 · ${site.name}的主页`}</title>
         <main className="flex min-h-dvh w-full items-center justify-center bg-gradient-to-b from-background to-muted/40 px-5">
           <div className="flex w-full max-w-md flex-col items-center text-center">
             <span className="flex size-16 items-center justify-center rounded-2xl bg-destructive/10">

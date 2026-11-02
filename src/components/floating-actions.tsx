@@ -37,9 +37,6 @@ export function FloatingActions() {
 
   const showBackToTop = scrollY > SCROLL_THRESHOLD;
   const isDark = resolvedTheme === "dark";
-  // 主题在客户端按日出日落动态确定（服务端无法预知），为避免服务端/客户端渲染不一致的
-  // hydration 告警，这里使用主题无关的通用文案；实际切换逻辑仍由 isDark 正确驱动。
-  const themeLabel = "切换深浅色模式";
 
   return (
     <>
@@ -50,6 +47,8 @@ export function FloatingActions() {
         size="icon-lg"
         aria-label="回到顶部"
         title="回到顶部"
+        tabIndex={showBackToTop ? 0 : -1}
+        aria-hidden={!showBackToTop}
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         className={`fixed right-6 z-50 size-12 rounded-full shadow-lg transition-all duration-300 ${BASE_BOTTOM} ${
           showBackToTop
@@ -65,8 +64,8 @@ export function FloatingActions() {
         type="button"
         variant="default"
         size="icon-lg"
-        aria-label={themeLabel}
-        title={themeLabel}
+        aria-label="快速切换深浅色模式"
+        title="快速切换深浅色模式"
         onClick={() => {
           markThemeOverriddenToday();
           setTheme(isDark ? "light" : "dark");

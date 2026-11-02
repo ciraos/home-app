@@ -3,6 +3,8 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { FloatingActions } from "@/components/floating-actions";
 import { getRenjianQuote } from "@/lib/dujitang";
+import { profile } from "@/lib/profile";
+import { site } from "@/lib/site";
 import { ChevronDown } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -16,11 +18,11 @@ export default async function HomeLayout({ children }: Readonly<{ children: Reac
         <Header />
         <div className="top-content w-full px-5 sm:px-16 lg:px-40 flex flex-col items-center gap-8 lg:flex-row lg:justify-between">
           <div className="text-center lg:text-left">
-            <div className="top-content-title text-4xl sm:text-6xl lg:text-7xl font-bold">米葱苓SAMA的 <br /> <div className="text-2xl sm:text-3xl">主页</div></div>
+            <div className="top-content-title text-4xl sm:text-6xl lg:text-7xl font-bold">{site.name}SAMA的 <br /> <div className="text-2xl sm:text-3xl">主页</div></div>
             <p className="djt mt-4 text-sm sm:text-base text-slate-500 dark:text-slate-400">{djt}</p>
           </div>
           <Image
-            src="/avatar.avif"
+            src={profile.avatar}
             alt="avatar"
             width={380}
             height={380}

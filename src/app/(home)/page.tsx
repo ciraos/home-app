@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  ArrowUp,
   BookMarked,
   Calendar,
   Globe,
@@ -20,15 +19,18 @@ import {
   profile,
   projects,
   socials,
+  statValue,
   stats,
   timeline,
   type IconType,
 } from "@/lib/profile";
+import { site } from "@/lib/site";
 import { getArticles } from "@/lib/articles";
 
 export const metadata: Metadata = {
-  title: "米葱苓的主页",
-  description: "米葱苓的主页，记录了我的学习、生活和一些有趣的事情。",
+  title: { absolute: `${site.name}的主页` },
+  description: site.description,
+  alternates: { canonical: "/" },
 };
 
 /** 卡片通用样式：与全站白底 + 圆角 + 阴影的风格保持一致 */
@@ -116,17 +118,14 @@ export default async function Home() {
         <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {stats.map((stat) => (
             <div
-              key={stat.label}
+              key={stat.key}
               className={`${card} flex flex-col items-center gap-1 p-5 text-center`}
             >
               <span className="text-2xl font-bold">
-                {stat.label === "文章"
-                  ? (articleCount ?? stat.value)
-                  : stat.label === "网站"
-                    ? projects.length
-                    : stat.label === "码龄"
-                      ? `${new Date().getFullYear() - 2020}年`
-                      : stat.value}
+                {statValue(stat.key, {
+                  articles: articleCount,
+                  sites: projects.length,
+                })}
               </span>
               <span className="text-sm text-muted-foreground">{stat.label}</span>
             </div>
@@ -136,28 +135,6 @@ export default async function Home() {
 
       {/* 技术栈 */}
       <Section id="skills" icon={Zap} title="技术栈">
-        {/* 原有技能网格已注释掉，改用整活文案 */}
-        {/* <div className="grid gap-4 sm:grid-cols-2">
-          {skillGroups.map((group) => (
-            <div key={group.title} className={`${card} p-6`}>
-              <h3 className="flex items-center gap-2 text-sm font-semibold">
-                <group.icon className="size-4 text-primary" />
-                {group.title}
-              </h3>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {group.items.map((item) => (
-                  <span
-                    key={item}
-                    className="rounded-full border border-border bg-muted/50 px-3 py-1 text-xs text-muted-foreground dark:bg-muted/20"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div> */}
-
         {/* 大号滑稽表情 + 一行文案 */}
         <div className={`${card} flex flex-col items-center gap-4 p-10 text-center`}>
           <span
@@ -203,7 +180,7 @@ export default async function Home() {
           )}
         </div>
         <Link
-          href="https://blog.ciraos.top/posts"
+          href={`${site.blogUrl}/posts`}
           target="_blank"
           rel="noreferrer"
           className="mt-4 inline-flex items-center gap-1 text-sm text-primary transition-colors hover:underline"
@@ -296,17 +273,6 @@ export default async function Home() {
           </div>
         </div>
       </Section>
-
-      {/* 回到顶部 */}
-      <div className="flex justify-center">
-        <a
-          href="#"
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-primary"
-        >
-          <ArrowUp className="size-4" />
-          回到顶部
-        </a>
-      </div>
     </div>
   );
 }

@@ -5,63 +5,55 @@
 // =============================================================
 
 import type { ComponentType } from "react";
-import {
-  Database,
-  Globe,
-  Laptop,
-  Mail,
-  Rss,
-  Server,
-  Wrench,
-} from "lucide-react";
+import { Globe, Mail, Rss } from "lucide-react";
 import { GithubIcon } from "@/components/icons";
+import { site } from "@/lib/site";
 
 /** 图标类型：lucide 图标与自定义品牌图标通用 */
 export type IconType = ComponentType<{ className?: string }>;
 
 // ---------- 基本信息 ----------
 export const profile = {
-  name: "米葱苓",
+  name: site.name,
   role: "前端开发 / 独立开发者",
   location: "中国 · 淮南",
-  email: "ciraos@yeah.net", // TODO: 改成你的邮箱
-  github: "https://github.com/ciraos", // TODO: 改成你的 GitHub 主页
+  email: "ciraos@yeah.net",
+  github: "https://github.com/ciraos",
   avatar: "/avatar.avif",
   bio: "你好呀，我是米葱苓 👋 一个喜欢折腾的开发者。这个主页用来记录我的学习笔记、生活日常和一些有趣的小项目。平时喜欢研究前端、写点小工具，也热衷于把想法变成能跑起来的代码。",
 } as const;
 
 // ---------- 数据统计 ----------
-// 「网站」数量由下方 projects 列表长度实时计算（见 page.tsx 渲染逻辑）
-export const stats: { label: string; value: string }[] = [
-  { label: "文章", value: "12" }, // 实际值由 articles API 实时获取
-  { label: "网站", value: "0" }, // 实际值 = projects.length
-  { label: "码龄", value: "0年" }, // 实际值 = 当前年份 - 2020（随年份自动 +1）
-  { label: "咖啡", value: "∞" },
+// 只声明展示的 key 与文案，具体数值统一由 statValue() 计算，
+// 避免在页面里用中文标题做字符串分支（改文案就失效）。
+export type StatKey = "articles" | "sites" | "coding" | "coffee";
+
+export const stats: { key: StatKey; label: string }[] = [
+  { key: "articles", label: "文章" },
+  { key: "sites", label: "网站" },
+  { key: "coding", label: "码龄" },
+  { key: "coffee", label: "咖啡" },
 ];
 
-// ---------- 技术栈 ----------
-export const skillGroups: { title: string; icon: IconType; items: string[] }[] = [
-  {
-    title: "前端",
-    icon: Laptop,
-    items: ["TypeScript", "React", "Next.js", "Tailwind CSS"],
-  },
-  {
-    title: "后端",
-    icon: Server,
-    items: ["Node.js", "Python", "RESTful API"],
-  },
-  {
-    title: "数据库与运维",
-    icon: Database,
-    items: ["MySQL", "Redis", "Docker", "Linux", "Nginx"],
-  },
-  {
-    title: "常用工具",
-    icon: Wrench,
-    items: ["Git", "VS Code"],
-  },
-];
+/** 开始学编程的年份：码龄 = 当前年份 - 该值 */
+const CODING_START_YEAR = 2020;
+
+/** 计算某个统计项的展示值；文章数取不到时显示「—」而不是假数字 */
+export function statValue(
+  key: StatKey,
+  ctx: { articles?: number; sites: number }
+): string {
+  switch (key) {
+    case "articles":
+      return ctx.articles === undefined ? "—" : String(ctx.articles);
+    case "sites":
+      return String(ctx.sites);
+    case "coding":
+      return `${Math.max(0, new Date().getFullYear() - CODING_START_YEAR)}年`;
+    case "coffee":
+      return "∞";
+  }
+}
 
 // ---------- 最近文章（已改为从 blog.ciraos.top 前端 API 实时拉取，见 src/lib/articles.ts） ----------
 
@@ -84,7 +76,7 @@ export const projects: {
       description:
         "我的博客站点，记录学习笔记、踩坑经验与生活点滴。",
       tags: ["博客"],
-      links: [{ label: "博客", href: "https://blog.ciraos.top", icon: Globe }],
+      links: [{ label: "博客", href: site.blogUrl, icon: Globe }],
     },
     {
       name: "预览博客",
@@ -178,6 +170,6 @@ export const socials: {
 }[] = [
     { label: "GitHub", href: "https://github.com/ciraos", icon: GithubIcon, external: true },
     { label: "邮箱", href: "mailto:ciraos@yeah.net", icon: Mail },
-    { label: "RSS", href: "/rss.xml", icon: Rss, external: true },
+    { label: "RSS", href: `${site.blogUrl}/rss.xml`, icon: Rss, external: true },
     // { label: "毒鸡汤 API", href: "https://v1.nsuuu.com/api", icon: Quote, external: true },
   ];

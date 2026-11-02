@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Moon, Sun } from "lucide-react"
+import { Check, Monitor, Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 
 import { Button } from "@/components/ui/button"
@@ -14,26 +14,42 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 export function ModeToggle() {
-    const { setTheme } = useTheme()
+    const { theme, setTheme } = useTheme()
+
+    // 手动选过一次就记下来，当天不再被日出日落自动切换覆盖
+    const choose = (next: "light" | "dark" | "system") => {
+        markThemeOverriddenToday()
+        setTheme(next)
+    }
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
+                <Button
+                    variant="outline"
+                    size="icon"
+                    aria-label="切换深浅色模式"
+                    title="切换深浅色模式"
+                >
                     <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
                     <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-                    <span className="sr-only">Toggle theme</span>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => { markThemeOverriddenToday(); setTheme("light"); }}>
+                <DropdownMenuItem onClick={() => choose("light")}>
+                    <Sun className="size-4" />
                     浅色模式
+                    {theme === "light" && <Check className="ml-auto size-4" />}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { markThemeOverriddenToday(); setTheme("dark"); }}>
+                <DropdownMenuItem onClick={() => choose("dark")}>
+                    <Moon className="size-4" />
                     深色模式
+                    {theme === "dark" && <Check className="ml-auto size-4" />}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { markThemeOverriddenToday(); setTheme("system"); }}>
+                <DropdownMenuItem onClick={() => choose("system")}>
+                    <Monitor className="size-4" />
                     跟随系统
+                    {theme === "system" && <Check className="ml-auto size-4" />}
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

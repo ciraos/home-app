@@ -11,6 +11,9 @@ const RENJIAN_API_URL =
 /** 接口密钥，缺失时接口返回 403 API_KEY_REQUIRED */
 const RENJIAN_API_KEY = process.env.RENJIAN_API_KEY ?? "";
 
+/** 接口最长等待时间：超时直接回落兜底文案，避免阻塞首页渲染 */
+const REQUEST_TIMEOUT_MS = 3_000;
+
 /** 兜底文案：接口不可用时展示，保证首屏不空 */
 export const RENJIAN_FALLBACK = "今天的毒鸡汤加载失败了，换个心情吧～";
 
@@ -61,7 +64,7 @@ function extractText(json: unknown, depth = 0): string | null {
  */
 export async function getRenjianQuote(): Promise<string> {
   if (!RENJIAN_API_KEY) {
-    console.error("缺少 RENJIAN_API_KEY，人间凑数接口会返回 403");
+    console.warn("缺少 RENJIAN_API_KEY，人间凑数接口会返回 403");
     return RENJIAN_FALLBACK;
   }
 
@@ -71,6 +74,7 @@ export async function getRenjianQuote(): Promise<string> {
 
     const res = await fetch(url, {
       cache: "no-store", // 每次访问都换一句
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       headers: { Accept: "application/json" },
     });
     if (!res.ok) throw new Error(`接口返回 ${res.status}`);

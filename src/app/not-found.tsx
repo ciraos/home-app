@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Home as HomeIcon, SearchX } from "lucide-react";
+import { site } from "@/lib/site";
 
 // 样式与主题变量由根布局（src/app/layout.tsx）统一加载
 
@@ -40,7 +41,7 @@ export default function NotFound() {
         </Link>
 
         <span className="mt-6 text-xs text-muted-foreground/70">
-          米葱苓 · 404
+          {site.name} · 404
         </span>
       </div>
     </main>

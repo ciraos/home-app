@@ -1,20 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  distDir: ".next",
+  // 生产构建输出到 .next/standalone，配合 pnpm copy / deploy 使用
   output: "standalone",
-  images: {
-    remotePatterns: [{
-      protocol: "https",
-      hostname: "s2.loli.net",
-      port: "",
-      pathname: "/2024/09/19/**"
-    }]
-  },
-  pageExtensions: ["tsx", "ts", "jsx", "js"],
   reactCompiler: true,
-  reactStrictMode: false
+  reactStrictMode: true,
 };
 
 export default nextConfig;

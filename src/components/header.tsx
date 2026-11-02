@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
+import { site } from "@/lib/site";
 
 const navItems = [
     { href: "#about", label: "关于我" },
@@ -21,7 +22,7 @@ export default function Header() {
     return (
         <header id="header" className="header w-full max-w-4xl min-h-12 px-5 py-2.5 my-0 mx-auto bg-white flex flex-col justify-center gap-0 shadow-md hover:shadow-xl rounded-b-2xl dark:bg-card">
             <div className="flex items-center justify-between gap-3">
-                <Link className="text-lg shrink-0 hover:underline dark:text-slate-300" href="/" onClick={() => setOpen(false)}>米葱苓</Link>
+                <Link className="text-lg shrink-0 hover:underline dark:text-slate-300" href="/" onClick={() => setOpen(false)}>{site.name}</Link>
 
                 {/* 桌面端导航 */}
                 <nav className="no-scrollbar hidden min-w-0 flex-1 items-center justify-center gap-4 overflow-x-auto text-sm sm:flex">

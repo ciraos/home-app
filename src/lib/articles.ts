@@ -31,6 +31,12 @@ const ARTICLES_API_URL =
   process.env.NEXT_PUBLIC_ARTICLES_API_URL ??
   "https://blog.ciraos.top/api/public/articles";
 
+/** 生产环境缓存 5 分钟，开发环境不缓存（方便边写文章边看效果） */
+const REVALIDATE_SECONDS = process.env.NODE_ENV === "development" ? 0 : 300;
+
+/** 接口最长等待时间：超时就走兜底，不让整页卡在第三方请求上 */
+const REQUEST_TIMEOUT_MS = 4_000;
+
 /** 内部共享的取数逻辑（列表 + 总数），失败返回 null */
 async function fetchArticleList(): Promise<{
   list: ArticleApiItem[];
@@ -38,7 +44,8 @@ async function fetchArticleList(): Promise<{
 } | null> {
   try {
     const res = await fetch(ARTICLES_API_URL, {
-      cache: "no-store", // 每次请求都拉取最新数据，文章列表与计数即时同步
+      next: { revalidate: REVALIDATE_SECONDS },
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       headers: { Accept: "application/json" },
     });
     if (!res.ok) throw new Error(`文章接口返回 ${res.status}`);
