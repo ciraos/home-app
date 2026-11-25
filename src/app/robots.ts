@@ -1,11 +1,16 @@
 import type { MetadataRoute } from "next";
-import { site } from "@/lib/site";
+
+import { loadSettings } from "@/lib/site-content";
+
+export const dynamic = "force-dynamic";
 
 /** 生成 /robots.txt，并把 sitemap 地址交给爬虫 */
-export default function robots(): MetadataRoute.Robots {
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const { siteUrl } = await loadSettings();
+
   return {
-    rules: [{ userAgent: "*", allow: "/" }],
-    sitemap: `${site.url}/sitemap.xml`,
-    host: site.url,
+    rules: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/setup"] }],
+    sitemap: `${siteUrl}/sitemap.xml`,
+    host: siteUrl,
   };
 }

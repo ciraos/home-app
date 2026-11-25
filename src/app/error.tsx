@@ -26,7 +26,7 @@ export default function Error({
           <AlertTriangle className="size-8 text-destructive" />
         </span>
 
-        <p className="mt-6 text-2xl font-bold text-foreground">啊哦，出错了</p>
+        <p className="mt-6 font-serif text-2xl text-foreground">啊哦，出错了</p>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           页面加载时出了点小问题，可能是网络波动，稍后重试一下就好。
         </p>
@@ -34,7 +34,7 @@ export default function Error({
         <button
           type="button"
           onClick={() => unstable_retry()}
-          className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl"
+          className="mt-8 inline-flex items-center gap-2 rounded-lg border border-border px-5 py-2.5 text-sm text-foreground transition-colors duration-150 hover:border-primary hover:text-primary"
         >
           <RefreshCw className="size-4" />
           再试一次

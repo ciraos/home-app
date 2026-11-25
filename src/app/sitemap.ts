@@ -1,11 +1,16 @@
 import type { MetadataRoute } from "next";
-import { site } from "@/lib/site";
 
-/** 生成 /sitemap.xml；目前只有一个首页 */
-export default function sitemap(): MetadataRoute.Sitemap {
+import { loadSettings } from "@/lib/site-content";
+
+export const dynamic = "force-dynamic";
+
+/** 生成 /sitemap.xml；目前只有首页 */
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const { siteUrl } = await loadSettings();
+
   return [
     {
-      url: site.url,
+      url: siteUrl,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 1,

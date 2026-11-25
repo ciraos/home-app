@@ -1,16 +1,41 @@
-import { site } from "@/lib/site";
+import Link from "next/link";
 
-export default function Footer() {
-    return (
-        <footer id="footer" className="footer w-full min-h-10 flex items-center justify-center pb-[env(safe-area-inset-bottom)]">
-            <a
-                target="_blank"
-                rel="noopener noreferrer nofollow"
-                className="flex justify-center text-sm text-blue-600 hover:underline dark:text-blue-300"
-                href={site.icpUrl}
-            >
-                {site.icp}
-            </a>
-        </footer>
-    )
+import { Seal } from "@/components/seal";
+
+export default function Footer({
+  name,
+  icp,
+  icpUrl,
+}: {
+  name: string;
+  icp: string;
+  icpUrl: string;
+}) {
+  const year = new Date().getFullYear();
+
+  return (
+    <footer className="border-t border-border">
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 px-6 py-8 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+        <p className="flex items-center gap-2">
+          <Seal label="米" className="size-5 text-[10px]" />
+          <span>
+            © {year} {name}
+          </span>
+        </p>
+        <div className="flex items-center gap-5">
+          <a
+            href={icpUrl}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            className="transition-colors duration-150 hover:text-foreground"
+          >
+            {icp}
+          </a>
+          <Link href="/admin" className="transition-colors duration-150 hover:text-foreground">
+            后台
+          </Link>
+        </div>
+      </div>
+    </footer>
+  );
 }

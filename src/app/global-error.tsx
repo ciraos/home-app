@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
-import { site } from "@/lib/site";
+import { defaultSettings } from "@/lib/defaults";
 import "./globals.css";
 
 /**
@@ -24,14 +24,14 @@ export default function GlobalError({
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <body className="bg-background text-foreground">
-        <title>{`出错了 · ${site.name}的主页`}</title>
+        <title>{`出错了 · ${defaultSettings.name}的主页`}</title>
         <main className="flex min-h-dvh w-full items-center justify-center bg-gradient-to-b from-background to-muted/40 px-5">
           <div className="flex w-full max-w-md flex-col items-center text-center">
             <span className="flex size-16 items-center justify-center rounded-2xl bg-destructive/10">
               <AlertTriangle className="size-8 text-destructive" />
             </span>
 
-            <p className="mt-6 text-2xl font-bold">啊哦，出错了</p>
+            <p className="mt-6 font-serif text-2xl">啊哦，出错了</p>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               抱歉，页面的渲染出了点问题，请稍后刷新或重试。
             </p>
@@ -39,7 +39,7 @@ export default function GlobalError({
             <button
               type="button"
               onClick={() => unstable_retry()}
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl"
+              className="mt-8 inline-flex items-center gap-2 rounded-lg border border-border px-5 py-2.5 text-sm text-foreground transition-colors duration-150 hover:border-primary hover:text-primary"
             >
               <RefreshCw className="size-4" />
               再试一次

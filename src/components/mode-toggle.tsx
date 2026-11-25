@@ -26,13 +26,14 @@ export function ModeToggle() {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button
-                    variant="outline"
+                    variant="ghost"
                     size="icon"
                     aria-label="切换深浅色模式"
                     title="切换深浅色模式"
+                    className="size-9 text-muted-foreground hover:text-foreground"
                 >
-                    <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-                    <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+                    <Sun className="size-[18px] scale-100 rotate-0 transition-transform duration-150 dark:scale-0 dark:-rotate-90" />
+                    <Moon className="absolute size-[18px] scale-0 rotate-90 transition-transform duration-150 dark:scale-100 dark:rotate-0" />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">

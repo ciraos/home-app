@@ -1,278 +1,297 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  BookMarked,
-  Calendar,
-  Globe,
-  GraduationCap,
-  Heart,
+  ArrowUpRight,
   Mail,
   MapPin,
-  Send,
-  Zap,
 } from "lucide-react";
+
 import { GithubIcon } from "@/components/icons";
-import {
-  profile,
-  projects,
-  socials,
-  statValue,
-  stats,
-  timeline,
-  type IconType,
-} from "@/lib/profile";
-import { site } from "@/lib/site";
+import { SocialIcon } from "@/components/social-icon";
 import { getArticles } from "@/lib/articles";
+import { loadSettings, loadSite } from "@/lib/site-content";
+import type { Stat } from "@/lib/types";
 
-export const metadata: Metadata = {
-  title: { absolute: `${site.name}的主页` },
-  description: site.description,
-  alternates: { canonical: "/" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await loadSettings();
+  return {
+    title: { absolute: `${settings.name}的主页` },
+    description: settings.description,
+    alternates: { canonical: settings.siteUrl || "/" },
+  };
+}
 
-/** 卡片通用样式：与全站白底 + 圆角 + 阴影的风格保持一致 */
-const card =
-  "rounded-2xl bg-white shadow-md transition-shadow hover:shadow-xl dark:bg-card";
-
-/** 区块容器：图标 + 标题 */
+/** 区块：编号 + 宋体标题 + 细线，页面靠这条线分区 */
 function Section({
   id,
-  icon: Icon,
+  index,
   title,
   children,
 }: {
   id: string;
-  icon: IconType;
+  index: string;
   title: string;
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-4">
-      <h2 className="mb-5 flex items-center gap-2.5 text-xl font-bold">
-        <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          <Icon className="size-5" />
-        </span>
-        {title}
-      </h2>
+    <section id={id} className="scroll-mt-24">
+      <header className="mb-8 flex items-baseline gap-4 border-b border-border pb-4">
+        <span className="font-mono text-[11px] text-muted-foreground">{index}</span>
+        <h2 className="font-serif text-2xl tracking-wide text-foreground">{title}</h2>
+      </header>
       {children}
     </section>
   );
 }
 
+/** 统计项数值：自动项按当前数据算，固定项直接显示 */
+function statDisplay(
+  stat: Stat,
+  ctx: { articles?: number; sites: number; years: number }
+): string {
+  switch (stat.kind) {
+    case "articles":
+      return ctx.articles === undefined ? "—" : String(ctx.articles);
+    case "sites":
+      return String(ctx.sites);
+    case "coding":
+      return `${Math.max(0, ctx.years)}年`;
+    default:
+      return stat.value || "—";
+  }
+}
+
 export default async function Home() {
-  // 列表与总数来自同一个接口，一次取回，避免重复请求
-  const { articles: recentArticles, count: articleCount } = await getArticles();
+  const [
+    { settings, stats, projects, timeline, socials },
+    { articles: recentArticles, count: articleCount },
+  ] = await Promise.all([loadSite(), getArticles()]);
+
+  const years = new Date().getFullYear() - settings.codingStartYear;
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-12 px-5 py-10">
-      {/* 关于我 */}
-      <Section id="about" icon={Heart} title="关于我">
-        <div
-          className={`${card} flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:p-8`}
-        >
-          <Image
-            src={profile.avatar}
-            alt={profile.name}
-            width={96}
-            height={96}
-            className="size-24 shrink-0 rounded-full border-4 border-gray-200 object-cover dark:border-gray-600"
-          />
-          <div className="min-w-0">
-            <p className="text-lg font-semibold">
-              {profile.name}
-              <span className="ml-2 text-sm font-normal text-muted-foreground">
-                {profile.role}
-              </span>
-            </p>
-            <p className="mt-2 leading-relaxed text-muted-foreground">
-              {profile.bio}
-            </p>
-            <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
-              <span className="inline-flex items-center gap-1.5">
-                <MapPin className="size-4" />
-                {profile.location}
-              </span>
-              <a
-                href={`mailto:${profile.email}`}
-                className="inline-flex items-center gap-1.5 transition-colors hover:text-primary"
-              >
-                <Mail className="size-4" />
-                {profile.email}
-              </a>
-              <a
-                href={profile.github}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 transition-colors hover:text-primary"
-              >
-                <GithubIcon className="size-4" />
-                GitHub
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {stats.map((stat) => (
-            <div
-              key={stat.key}
-              className={`${card} flex flex-col items-center gap-1 p-5 text-center`}
-            >
-              <span className="text-2xl font-bold">
-                {statValue(stat.key, {
-                  articles: articleCount,
-                  sites: projects.length,
-                })}
-              </span>
-              <span className="text-sm text-muted-foreground">{stat.label}</span>
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      {/* 技术栈 */}
-      <Section id="skills" icon={Zap} title="技术栈">
-        {/* 大号滑稽表情 + 一行文案 */}
-        <div className={`${card} flex flex-col items-center gap-4 p-10 text-center`}>
-          <span
-            role="img"
-            aria-label="滑稽表情"
-            className="text-7xl leading-none sm:text-8xl"
-          >
-            😏
-          </span>
-          <p className="text-base text-muted-foreground">
-            骗你的，啥都不会，全靠AI
-          </p>
-        </div>
-      </Section>
-
-      {/* 最近文章 */}
-      <Section id="posts" icon={BookMarked} title="最近文章">
-        <div className="grid gap-4 sm:grid-cols-3">
-          {recentArticles.length === 0 ? (
-            <div className={`${card} p-6 text-sm text-muted-foreground`}>
-              暂无文章，稍后再来看看吧～
-            </div>
-          ) : (
-            recentArticles.map((post) => (
-              <div
-                key={post.id}
-                className={`${card} group flex flex-col gap-2.5 p-6`}
-              >
-                {post.tag && (
-                  <span className="w-fit rounded-full bg-primary/10 px-2.5 py-0.5 text-xs text-primary">
-                    {post.tag}
-                  </span>
-                )}
-                <h3 className="flex-1 font-semibold transition-colors group-hover:text-primary">
-                  {post.title}
-                </h3>
-                <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Calendar className="size-3.5" />
-                  {post.date}
+    <div className="mx-auto w-full max-w-5xl px-6 pt-16 pb-24 sm:pt-20">
+      <div className="flex flex-col gap-20 sm:gap-24">
+        {/* 关于我 */}
+        <Section id="about" index="01" title="关于我">
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-16">
+            <div>
+              <p className="font-mono text-[11px] text-muted-foreground">
+                {settings.role} · {settings.location}
+              </p>
+              <p className="mt-4 max-w-[38rem] text-[15px] leading-7 text-foreground/85">
+                {settings.bio}
+              </p>
+              <div className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-3 text-sm text-muted-foreground">
+                <a
+                  href={`mailto:${settings.email}`}
+                  className="inline-flex items-center gap-2 transition-colors duration-150 hover:text-foreground"
+                >
+                  <Mail className="size-4" strokeWidth={1.5} />
+                  {settings.email}
+                </a>
+                <a
+                  href={settings.github}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 transition-colors duration-150 hover:text-foreground"
+                >
+                  <GithubIcon className="size-4" />
+                  GitHub
+                </a>
+                <span className="inline-flex items-center gap-2">
+                  <MapPin className="size-4" strokeWidth={1.5} />
+                  {settings.location}
                 </span>
               </div>
-            ))
-          )}
-        </div>
-        <Link
-          href={`${site.blogUrl}/posts`}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-4 inline-flex items-center gap-1 text-sm text-primary transition-colors hover:underline"
-        >
-          查看全部文章
-          <ArrowRight className="size-4" />
-        </Link>
-      </Section>
-
-      {/* 个人网站 */}
-      <Section id="projects" icon={Globe} title="个人网站">
-        <div className="grid gap-4 sm:grid-cols-2">
-          {projects.map((project) => (
-            <div key={project.name} className={`${card} flex flex-col gap-3 p-6`}>
-              <div className="flex items-start justify-between gap-3">
-                <h3 className="font-semibold">{project.name}</h3>
-                <div className="flex shrink-0 gap-1.5">
-                  {project.links.map((link) => (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={link.label}
-                      className="text-muted-foreground transition-colors hover:text-primary"
-                    >
-                      <link.icon className="size-4" />
-                    </a>
-                  ))}
-                </div>
-              </div>
-              <p className="flex-1 text-sm leading-relaxed text-muted-foreground">
-                {project.description}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {project.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground dark:bg-muted/20"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
             </div>
-          ))}
-        </div>
-      </Section>
 
-      {/* 成长足迹 */}
-      <Section id="timeline" icon={GraduationCap} title="成长足迹">
-        <div className={`${card} p-6 sm:p-8`}>
-          <ol className="relative space-y-6 border-l border-border pl-6">
-            {timeline.map((item) => (
-              <li key={item.title} className="relative">
-                <span className="absolute -left-7.5 top-1 size-3 rounded-full bg-primary ring-4 ring-primary/20" />
-                <p className="text-sm font-semibold">{item.title}</p>
-                {item.date && (
-                  <p className="text-xs text-muted-foreground">{item.date}</p>
-                )}
-                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  {item.description}
-                </p>
+            <dl className="grid grid-cols-2 gap-px self-start border border-border bg-border">
+              {stats.map((stat) => (
+                <div key={stat.id} className="bg-background p-5">
+                  <dd className="font-serif text-3xl tabular-nums text-foreground">
+                    {statDisplay(stat, {
+                      articles: articleCount,
+                      sites: projects.length,
+                      years,
+                    })}
+                  </dd>
+                  <dt className="mt-1 text-xs text-muted-foreground">{stat.label}</dt>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </Section>
+
+        {/* 技术栈 */}
+        <Section id="skills" index="02" title="技术栈">
+          <blockquote className="border-l-2 border-primary pl-6 sm:pl-8">
+            <p className="max-w-[30rem] font-serif text-2xl leading-snug text-foreground sm:text-[1.75rem]">
+              骗你的，啥都不会，全靠 AI
+            </p>
+            <footer className="mt-4 font-mono text-[11px] text-muted-foreground">
+              —— {settings.name}
+            </footer>
+          </blockquote>
+        </Section>
+
+        {/* 最近文章 */}
+        <Section id="posts" index="03" title="最近文章">
+          {recentArticles.length === 0 ? (
+            <p className="text-sm text-muted-foreground">暂无文章，稍后再来看看</p>
+          ) : (
+            <div className="flex flex-col">
+              {recentArticles.map((post) => (
+                <Link
+                  key={post.id}
+                  href={`${settings.blogUrl}/posts`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group grid gap-1.5 border-b border-border py-5 transition-colors duration-150 first:border-t sm:grid-cols-[7rem_minmax(0,1fr)_auto] sm:items-baseline sm:gap-6"
+                >
+                  <span className="font-mono text-[11px] text-muted-foreground">{post.date}</span>
+                  <h3 className="font-serif text-lg text-foreground transition-colors duration-150 group-hover:text-primary">
+                    {post.title}
+                  </h3>
+                  {post.tag ? (
+                    <span className="text-xs text-muted-foreground">{post.tag}</span>
+                  ) : null}
+                </Link>
+              ))}
+            </div>
+          )}
+
+          <Link
+            href={`${settings.blogUrl}/posts`}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-6 inline-flex items-center gap-1.5 text-sm text-foreground transition-colors duration-150 hover:text-primary"
+          >
+            查看全部文章
+            <ArrowRight className="size-4" strokeWidth={1.5} />
+          </Link>
+        </Section>
+
+        {/* 个人网站 */}
+        <Section id="projects" index="04" title="个人网站">
+          <div className="grid gap-x-12 sm:grid-cols-2">
+            {projects.map((project) => {
+              // 只有一个链接时，整个条目都是可点击区域，而不是只点右上角小箭头
+              const singleLink = project.links.length === 1 ? project.links[0] : null;
+
+              const body = (
+                <>
+                  <div className="flex items-baseline justify-between gap-4">
+                    <h3
+                      className={`font-serif text-lg text-foreground transition-colors duration-150 ${
+                        singleLink ? "group-hover:text-primary" : ""
+                      }`}
+                    >
+                      {project.name}
+                    </h3>
+                    {singleLink ? (
+                      <span className="inline-flex shrink-0 items-center gap-1 text-xs text-muted-foreground transition-colors duration-150 group-hover:text-primary">
+                        {singleLink.label}
+                        <ArrowUpRight className="size-4" strokeWidth={1.5} />
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {project.description}
+                  </p>
+                  <p className="mt-3 font-mono text-[11px] text-muted-foreground">
+                    {project.tags.join(" / ")}
+                  </p>
+
+                  {project.links.length > 1 ? (
+                    <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1">
+                      {project.links.map((link) => (
+                        <a
+                          key={`${link.label}-${link.href}`}
+                          href={link.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 py-1 text-sm text-foreground underline decoration-border underline-offset-4 transition-colors duration-150 hover:text-primary hover:decoration-primary"
+                        >
+                          {link.label}
+                          <ArrowUpRight className="size-3.5" strokeWidth={1.5} />
+                        </a>
+                      ))}
+                    </div>
+                  ) : null}
+                </>
+              );
+
+              return singleLink ? (
+                <a
+                  key={project.id}
+                  href={singleLink.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`${project.name} · ${singleLink.label}（新窗口打开）`}
+                  className="group block border-b border-border py-6"
+                >
+                  {body}
+                </a>
+              ) : (
+                <article key={project.id} className="border-b border-border py-6">
+                  {body}
+                </article>
+              );
+            })}
+          </div>
+        </Section>
+
+        {/* 成长足迹 */}
+        <Section id="timeline" index="05" title="成长足迹">
+          <ol className="flex flex-col">
+            {timeline.map((item, index) => (
+              <li
+                key={item.id}
+                className="grid gap-2 border-b border-border py-5 sm:grid-cols-[5rem_minmax(0,1fr)] sm:gap-8"
+              >
+                <span className="font-mono text-[11px] text-muted-foreground">
+                  {item.date || String(index + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <h3 className="font-serif text-lg text-foreground">{item.title}</h3>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    {item.description}
+                  </p>
+                </div>
               </li>
             ))}
           </ol>
-        </div>
-      </Section>
+        </Section>
 
-      {/* 联系我 */}
-      <Section id="contact" icon={Send} title="联系我">
-        <div className={`${card} flex flex-col items-center gap-4 p-8 text-center`}>
-          <p className="text-lg font-semibold">欢迎交流 👋</p>
-          <p className="max-w-md text-sm text-muted-foreground">
-            有任何问题或合作想法，都可以通过下面的方式找到我，看到就会回复～
-          </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            {socials.map((social) => (
-              <a
-                key={social.label}
-                href={social.href}
-                target={social.external ? "_blank" : undefined}
-                rel={social.external ? "noreferrer" : undefined}
-                className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm transition-colors hover:border-primary hover:text-primary"
-              >
-                <social.icon className="size-4" />
-                {social.label}
-              </a>
-            ))}
+        {/* 联系我 */}
+        <Section id="contact" index="06" title="联系我">
+          <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="font-serif text-2xl text-foreground">欢迎交流</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                有问题或合作想法，发邮件最快。
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-x-7 gap-y-3 text-sm">
+              {socials.map((social) => (
+                <a
+                  key={social.id}
+                  href={social.href}
+                  target={social.external ? "_blank" : undefined}
+                  rel={social.external ? "noreferrer" : undefined}
+                  className="inline-flex items-center gap-2 text-muted-foreground transition-colors duration-150 hover:text-foreground"
+                >
+                  <SocialIcon name={social.icon} className="size-4" />
+                  {social.label}
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
-      </Section>
+        </Section>
+      </div>
     </div>
   );
 }

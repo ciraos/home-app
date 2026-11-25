@@ -34,6 +34,10 @@ yarn-error.log*
 .env*
 !.env.example
 
+# 本地数据库（PGlite）与后台上传文件
+/data/
+/public/uploads/
+
 # vercel
 .vercel
 
